@@ -184,7 +184,6 @@ int main(int argc, char* argv[]) {
 
         if (currentThread->pid != currentThreadPid || currentThread->threadId != currentThreadId) {
             cpu.recordContextSwitch();
-            // --- FIX --- (7 fields)
             logFile << simulationTime << ",CONTEXT_SWITCH," << currentThread->pid << "," << currentThread->threadId << ",,,\n";
             currentThreadPid = currentThread->pid;
             currentThreadId = currentThread->threadId;
@@ -204,20 +203,17 @@ int main(int argc, char* argv[]) {
                   << " (Page " << std::dec << pageNum << "), Type: " << (isWrite ? "Write" : "Read") << std::endl;
         
         cpu.execute(process, currentThread->threadId);
-        // --- FIX --- (7 fields)
         logFile << simulationTime << ",CPU_EXECUTE," << currentThread->pid << "," << currentThread->threadId << "," << pageNum << ",,\n";
 
         
         if (tlb.lookup(currentThread->pid, pageNum, frameNum)) {
             std::cout << "-> TLB Hit! Frame: " << frameNum << std::endl;
-            // --- FIX --- (7 fields)
             logFile << simulationTime << ",TLB_HIT," << currentThread->pid << "," << currentThread->threadId << "," << pageNum << "," << frameNum << ",\n";
             clock.setReferenced(frameNum);
             clock.setModified(frameNum, isWrite);
         
         } else {
             std::cout << "-> TLB Miss." << std::endl;
-            // --- FIX --- (7 fields)
             logFile << simulationTime << ",TLB_MISS," << currentThread->pid << "," << currentThread->threadId << "," << pageNum << ",,\n";
             frameNum = pageTable.getFrame(currentThread->pid, pageNum);
 
@@ -228,7 +224,6 @@ int main(int argc, char* argv[]) {
                 tlb.insert(currentThread->pid, pageNum, frameNum);
             } else {
                 std::cout << "-> Page Fault!" << std::endl;
-                // --- FIX --- (7 fields)
                 logFile << simulationTime << ",PAGE_FAULT," << currentThread->pid << "," << currentThread->threadId << "," << pageNum << ",,\n";
                 int evictedPage = -1;
                 bool isEvictedPageModified = false;
@@ -239,7 +234,6 @@ int main(int argc, char* argv[]) {
                 );
 
                 std::cout << "-> Page loaded into Frame " << frameNum << "." << std::endl;
-                // --- FIX --- (7 fields)
                 logFile << simulationTime << ",PAGE_LOAD," << currentThread->pid << "," << currentThread->threadId << "," << pageNum << "," << frameNum << "," << evictedPage << "\n";
                 
                 if (evictedPage != -1) {
